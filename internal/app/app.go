@@ -53,7 +53,7 @@ func Run(ctx context.Context) error {
 		}
 	})
 
-	logger.Println("Initilizing...")
+	logger.Println("Initializing...")
 
 	// Initialize the C library and register callbacks using the global handle.
 	var err error
