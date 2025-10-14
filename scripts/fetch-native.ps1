@@ -11,14 +11,14 @@ This version downloads the release asset directly via HTTPS:
 #>
 
 param(
-  [Parameter(Mandatory = $true)][string]$Tag,                         # e.g. v1.2.3
   [string]$RepoPath = "github.com/eduarddanziger/sound-win-scanner",
   [string]$PkgSubDir = "pkg\soundlibwrap",
-  [string]$DllOutDir = "E:\DWP\github\win-sound-dev-go-bridge\bin"
+  [string]$DllOutSubDir = "bin"
 )
-
 $ErrorActionPreference = "Stop"
 
+$DllOutDir = Join-Path -Path (Get-Location) -ChildPath $DllOutSubDir
+$Tag = (go list -m -f='{{.Version}}' $RepoPath/v4)
 $baseModDir = (go env GOMODCACHE)
 
 $PkgDir = Join-Path -Path $baseModDir -ChildPath $RepoPath
