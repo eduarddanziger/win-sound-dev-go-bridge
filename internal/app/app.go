@@ -6,8 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"win-sound-dev-go-bridge/internal/saawrapper"
 	"win-sound-dev-go-bridge/pkg/appinfo"
+
+	saawrapper "github.com/eduarddanziger/sound-win-scanner/v4/pkg/soundlibwrap"
 )
 
 var SaaHandle saawrapper.Handle
