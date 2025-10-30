@@ -2,10 +2,11 @@ package app
 
 import (
 	"context"
-	"github.com/eduarddanziger/win-sound-dev-go-bridge/pkg/appinfo"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/eduarddanziger/win-sound-dev-go-bridge/pkg/appinfo"
 
 	"github.com/eduarddanziger/sound-win-scanner/v4/pkg/soundlibwrap"
 )
