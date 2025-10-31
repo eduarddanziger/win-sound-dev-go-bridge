@@ -1,7 +1,6 @@
 # PowerShell
 <#!
 Usage (local dev):
-  .\scripts\fetch-native.ps1 -Tag v4.0.4-rc002 \
     -RepoPath = "github.com/eduarddanziger/sound-win-scanner"
     -PkgSubDir = "github.com\eduarddanziger\sound-win-scanner\v4@v4.0.4-rc002\pkg\soundlibwrap" \
     -DllOutDir .\out
