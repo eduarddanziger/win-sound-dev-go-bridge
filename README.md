@@ -7,12 +7,12 @@ Go + cgo bridge to `SoundAgentApiDll.dll` for monitoring/querying Windows defaul
 Prereqs: CGO enabled and a GCC-style toolchain (MinGW-w64 gcc or LLVM-mingw clang).
 - Download an x86_64 LLVM‑mingw build (zip) from the official releases (search for “llvm-mingw releases”).
 - Your download's name is similar to llvm-mingw-20251118-msvcrt-x86_64.zip
-- Copy its bin, include,lib and x86_64-w64-mingw32 folders to C:\tools\llvm-mingw 
+- Copy its bin, include,lib and x86_64-w64-mingw32 folders to some folder, e.g. E:\tools\llvm-mingw 
 
 ```powershell
 $Env:CGO_ENABLED = "1"
-$Env:CC = "C:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang.exe"
-$Env:CXX = "C:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang++.exe"
+$Env:CC = "E:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang.exe"
+$Env:CXX = "E:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang++.exe"
 
 go build -o (Join-Path $PWD.Path 'bin/')
 
