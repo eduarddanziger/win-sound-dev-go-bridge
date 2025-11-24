@@ -3,9 +3,11 @@
 Go + cgo bridge to `SoundAgentApiDll.dll` for monitoring/querying Windows default audio devices.
 
 ## Build (powershell)
+
 Prereqs: CGO enabled and a GCC-style toolchain (MinGW-w64 gcc or LLVM-mingw clang).
-E.g. if you download llvm-mingw-20251118-msvcrt-x86_64.zip, copy its bin, include,
-lib and x86_64-w64-mingw32 folders to C:\tools\llvm-mingw 
+- Download an x86_64 LLVM‑mingw build (zip) from the official releases (search for “llvm-mingw releases”).
+- Your download's name is similar to llvm-mingw-20251118-msvcrt-x86_64.zip
+- Copy its bin, include,lib and x86_64-w64-mingw32 folders to C:\tools\llvm-mingw 
 
 ```powershell
 $Env:CGO_ENABLED = "1"
@@ -15,6 +17,11 @@ $Env:CXX = "C:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang++.exe"
 go build -o (Join-Path $PWD.Path 'bin/')
 
 .\scripts\fetch-native.ps1
+
+## once more
+go build -o (Join-Path $PWD.Path 'bin/') 
+
+
 
 ```
 
@@ -28,8 +35,8 @@ go build -o (Join-Path $PWD.Path 'bin/')
 - github.com/eduarddanziger/sound-win-scanner/v4 (pkg/soundlibwrap): cgo wrapper around SoundAgentApi, see [soundlibwrap documentation](https://pkg.go.dev/github.com/eduarddanziger/sound-win-scanner/v4/pkg/soundlibwrap)
 
 ## Advanced
-Use clang instead of gcc:
+Youz can use  clang instead of gcc:
 ```bat
-set CC=x86_64-w64-mingw32-clang
-set CXX=x86_64-w64-mingw32-clang++
+set CC=...x86_64-w64-mingw32-clang
+set CXX=...x86_64-w64-mingw32-clang++
 ```
