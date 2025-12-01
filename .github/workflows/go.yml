@@ -80,40 +80,33 @@ jobs:
         with:
           go-version: "1.25.x"
 
-      - name: Setup MSVC developer environment
+      - name: Install llvm-mingw (clang toolchain for CGO)
         shell: powershell
         run: |
-          # Use vswhere to locate the latest VS with C++ tools
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          if (-not (Test-Path $vswhere)) {
-            throw "vswhere.exe not found at $vswhere"
+          # NOTE: keep this in sync with a real llvm-mingw release tag
+          $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/20240619/llvm-mingw-20240619-msvcrt-x86_64.zip"
+          $zip = Join-Path $Env:TEMP "llvm-mingw.zip"
+          $destRoot = "C:\tools"
+          $dest = Join-Path $destRoot "llvm-mingw"
+
+          New-Item -ItemType Directory -Force -Path $destRoot | Out-Null
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+
+          Write-Host "Downloading llvm-mingw from $url ..."
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+
+          Write-Host "Extracting to $dest ..."
+          Expand-Archive -Path $zip -DestinationPath $dest -Force
+
+          # The archive usually unpacks into a subfolder; move contents up if needed
+          $inner = Get-ChildItem -Path $dest | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+          if ($inner) {
+            Write-Host "Flattening $($inner.FullName) into $dest ..."
+            Get-ChildItem -Path $inner.FullName | Move-Item -Destination $dest -Force
+            Remove-Item -Recurse -Force $inner.FullName
           }
-
-          $vsInstallPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-          if (-not $vsInstallPath) {
-            throw "No Visual Studio with C++ tools found."
-          }
-
-          Write-Host "Using Visual Studio at $vsInstallPath"
-
-          $vcvarsall = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvarsall.bat'
-          if (-not (Test-Path $vcvarsall)) {
-            throw "vcvarsall.bat not found at $vcvarsall"
-          }
-
-          # Run vcvarsall.bat to set up the environment for x64 and capture it into this PowerShell session
-          $tmpFile = New-TemporaryFile
-          cmd.exe /c "`"$vcvarsall`" x64 >nul && set" | Out-File -FilePath $tmpFile -Encoding ASCII
-
-          Get-Content $tmpFile | ForEach-Object {
-            $name, $value = $_ -split '=', 2
-            if ($name -and $value) {
-              # Persist into GitHub Actions env so subsequent steps (including Go) see MSVC+Clang toolchain
-              "$name=$value" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-            }
-          }
-
-          Remove-Item $tmpFile -Force
+          Remove-Item $zip -Force
+          Write-Host "llvm-mingw installed under $dest"
 
       - name: Setting environment variables for the rest of the steps
         shell: powershell
@@ -126,9 +119,8 @@ jobs:
             $version = $version.Substring(1)
           }
           $cgo_enabled = "1"
-          # Use MSVC clang-cl from the Visual Studio toolchain
-          $cc  = "clang.exe"
-          $cxx = "clang++.exe"
+          $cc  = "C:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang.exe"
+          $cxx = "C:\tools\llvm-mingw\bin\x86_64-w64-mingw32-clang++.exe"
           Write-Host "Computed APP_VERSION=$version"
           "CGO_ENABLED=$cgo_enabled" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
           "CC=$cc" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
@@ -169,7 +161,7 @@ jobs:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: |
           $ldflags = "-X github.com/eduarddanziger/win-sound-dev-go-bridge/pkg/appinfo.Version=$Env:APP_VERSION"
-          Write-Host "Restarting go build with CGO (MSVC/clang-cl)..."
+          Write-Host "Restarting go build with CGO..."
           go build -ldflags $ldflags -o (Join-Path $PWD.Path 'bin/')
 
       - name: Package bin directory
