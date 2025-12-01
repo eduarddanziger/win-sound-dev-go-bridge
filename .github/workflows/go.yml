@@ -127,8 +127,8 @@ jobs:
           }
           $cgo_enabled = "1"
           # Use MSVC clang-cl from the Visual Studio toolchain
-          $cc  = "clang-cl.exe"
-          $cxx = "clang-cl.exe"
+          $cc  = "clang.exe"
+          $cxx = "clang++.exe"
           Write-Host "Computed APP_VERSION=$version"
           "CGO_ENABLED=$cgo_enabled" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
           "CC=$cc" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
